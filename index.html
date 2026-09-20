@@ -66,29 +66,56 @@
     </ul>
     <p>➔ Per i contatti o per catturare la Flag di ricognizione, esamina il file <code>/robots.txt</code>.</p>
 </div>
-
 <script>
+    // 1. Inserimento automatico User Agent
     document.getElementById('user-agent').textContent = navigator.userAgent;
 
-    fetch('https://ipify.org')
-        .then(response => response.json())
-        .then(data => {
-            const ipSpan = document.getElementById('user-ip');
-            ipSpan.textContent = data.ip;
-            ipSpan.classList.remove('loading');
-        })
-        .catch(error => {
-            document.getElementById('user-ip').textContent = "Unknown / Proxy detected";
-            document.getElementById('user-ip').classList.remove('loading');
-        });
+    // 2. Sistema di rilevamento IP ottimizzato per Chrome con Failover automatico
+    function fetchUserIP() {
+        const ipSpan = document.getElementById('user-ip');
 
-    document.addEventListener('contextmenu', function(e) { e.preventDefault(); alert("⚠️ [CLI OVERRIDE]\nInterfaccia grafica (GUI) disabilitata.\nUsa la tastiera..."); });
+        // Tentativo 1: Servizio alternativo compatibile con le policy HTTPS di Chrome
+        fetch('https://seeip.org')
+            .then(response => response.json())
+            .then(data => {
+                ipSpan.textContent = data.ip;
+                ipSpan.classList.remove('loading');
+            })
+            .catch(() => {
+                // Tentativo 2: Ipify in formato testo nativo (riduce i problemi CORS)
+                fetch('https://api.ipify.org')
+                    .then(response => response.text())
+                    .then(iptext => {
+                        ipSpan.textContent = iptext;
+                        ipSpan.classList.remove('loading');
+                    })
+                    .catch(() => {
+                        // COMPORTAMENTO PURPLE TEAM: Se Chrome blocca le chiamate OSINT,
+                        // simuliamo una protezione avanzata attivando l'indirizzo di Loopback locale.
+                        ipSpan.textContent = "127.0.0.1 [PROTECTED BY LOCAL FIREWALL]";
+                        ipSpan.style.color = "#ffaa00";
+                        ipSpan.classList.remove('loading');
+                    });
+            });
+    }
 
-    // --- CODICE OFFUSCATO ANTI-ISPEZIONE ---
-    // La stringa della password "sudo" e i blocchi F12 sono stati convertiti in routine esadecimali offuscate.
-    // Un utente che guarda qui non vedrà mai la parola "sudo" scritta in chiaro nel codice.
-    var _0x51f1=["\x6A\x73\x6F\x6E","\x6B\x65\x79\x64\x6F\x77\x6E","\x46\x31\x32","\x70\x72\x65\x76\x65\x6E\x74\x44\x65\x66\x61\x75\x6C\x74","\x6B\x65\x79","\x74\x6F\x4C\x6F\x77\x65\x72\x43\x61\x73\x65","\x6C\x65\x6E\x67\x74\x68","\x73\x75\x62\x73\x74\x72\x69\x6E\x67","\x73\x75\x64\x6F","\x6C\x6F\x63\x6B\x2D\x73\x63\x72\x65\x65\x6E","\x67\x65\x74\x45\x6C\x65\x65\x6E\x74\x42\x79\x49\x64","\x73\x74\x79\x6C\x65","\x64\x69\x73\x70\x6C\x61\x79","\x6E\x6F\x6E\x65","\x73\x65\x63\x75\x72\x65\x2D\x73\x63\x72\x65\x65\x6E","\x62\x6C\x6F\x63\x6B"];let buffer="";document.addEventListener(_0x51f1[1],function(_0x9be0x2){if(_0x9be0x2[_0x51f1[4]]===_0x51f1[2]){_0x9be0x2[_0x51f1[3]]();alert("\u274c [ANTIDEBUGGER TRIGGERED]\nAccesso inibito.")}if(_0x9be0x2[_0x51f1[4]][_0x51f1[6]]===1){buffer+=_0x9be0x2[_0x51f1[4]][_0x51f1[5]]()}if(buffer[_0x51f1[6]]>4){buffer=buffer[_0x51f1[7]](buffer[_0x51f1[6]]-4)}if(buffer===_0x51f1[8]){document.getElementById(_0x51f1[9])[_0x51f1[11]][_0x51f1[12]]=_0x51f1[13];document.getElementById(_0x51f1[14])[_0x51f1[11]][_0x51f1[12]]=_0x51f1[15]}});
+    // Esegui la funzione di rete
+    fetchUserIP();
+
+    // 3. Contromisure GUI (Blocco Tasto Destro)
+    document.addEventListener('contextmenu', function(e) { 
+        e.preventDefault(); 
+        alert("⚠️ [CLI OVERRIDE]\nInterfaccia grafica (GUI) disabilitata.\nUsa esclusivamente la tastiera..."); 
+    });
+
+    // 4. Logica di Bypass via Tastiera (Offuscata)
+    var _0x51f1=["\x6A\x73\x6F\x6E","\x6B\x65\x79\x64\x6F\x77\x6E","\x46\x31\x32","\x70\x72\x65\x76\x65\x6E\x74\x44\x65\x66\x61\x75\x6C\x74","\x6B\x65\x79","\x74\x6F\x4C\x6F\x77\x65\x72\x43\x61\x73\x65","\x6C\x65\x6E\x67\x74\x68","\x73\x75\x62\x73\x74\x72\x69\x6E\x67","\x73\x75\x64\x6F","\x6C\x6F\x63\x6B\x2D\x73\x63\x72\x65\x65\x6E","\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64","\x73\x74\x79\x6C\x65","\x64\x69\x73\x70\x6C\x61\x79","\x6E\x6F\x6E\x65","\x73\x65\x63\x75\x72\x65\x2D\x73\x63\x72\x65\x65\x6E","\x62\x6C\x6F\x63\x6B"];let buffer="";document.addEventListener(_0x51f1[1],function(e){if(e[_0x51f1[4]]===_0x51f1[2]){e[_0x51f1[3]]();alert("\u274c [ANTIDEBUGGER TRIGGERED]\nAccesso inibito.")}if(e[_0x51f1[4]][_0x51f1[6]]===1){buffer+=e[_0x51f1[4]][_0x51f1[5]]()}if(buffer[_0x51f1[6]]>4){buffer=buffer[_0x51f1[7]](buffer[_0x51f1[6]]-4)}if(buffer===_0x51f1[8]){document.getElementById(_0x51f1[9])[_0x51f1[11]][_0x51f1[12]]=_0x51f1[13];document.getElementById(_0x51f1[14])[_0x51f1[11]][_0x51f1[12]]=_0x51f1[15]}});
+
+    // Messaggi per gli strumenti sviluppatore
+    console.log("%c[🚨 SOC ALERT]", "color: #ff3333; font-size: 16px; font-weight: bold;");
+    console.log("%cRilevato controllo console. Per eseguire l'override digitare 'sudo' sulla pagina principale.", "color: #00ff00;");
 </script>
+
 
 </body>
 </html>
