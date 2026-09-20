@@ -26,7 +26,7 @@
             font-weight: bold;
         }
         .hidden-content {
-            display: none; /* Nasconde i contenuti veri finché non viene digitata la password */
+            display: none;
             border: 1px solid #00ffaa;
             padding: 20px;
             background-color: #020b08;
@@ -44,22 +44,20 @@
 </head>
 <body>
 
-<!-- 1. SCHERMATA CENTRALE (FINTO BLOCCO) -->
 <div id="lock-screen" class="console">
     <p>[🚨 SECURITY AUDIT IN PROGRESS...]</p>
     <p>> TARGET DETECTED: <span id="user-agent">Rilevamento in corso...</span></p>
     <p>> PUBLIC IP ADDRESS: <span id="user-ip" class="loading">In attesa di handshake...</span></p>
     <hr style="border: 0; border-top: 1px dashed #00ff00;">
     <p class="error-msg">[!] ATTENZIONE: Interfaccia GUI limitata. Criteri di hardening attivi.</p>
-    <p style="color: #888888;">(Suggerimento di sistema: Digita la password "sudo" sulla tastiera per l'autenticazione analista...)</p>
+    <p style="color: #888888;">(Suggerimento di sistema: Digita la password di sblocco analista sulla tastiera...)</p>
     <p>guest@purpleteam-l1:~$ <span class="loading">_</span></p>
 </div>
 
-<!-- 2. SCHERMATA SEGRETA (SBLOCCATA VIA TASTIERA) -->
 <div id="secure-screen" class="hidden-content">
     <h2 style="color: #00ffaa;">🔓 [OVERRIDE DI SISTEMA RIUSCITO - BENVENUTO ANALISTA]</h2>
     <p>➔ Autenticazione bypassata con successo tramite keystroke injection.</p>
-    <hr style="border-0; border-top: 1px solid #00ffaa;">
+    <hr style="border: 0; border-top: 1px solid #00ffaa;">
     <h3>🗂️ PORTFOLIO PROGETTI - PURPLE TEAM L1</h3>
     <ul>
         <li><b>Wi-Fi Pentesting Lab:</b> Analisi vulnerabilità protocolli WPA2/WPA3 e cattura handshake.</li>
@@ -70,10 +68,8 @@
 </div>
 
 <script>
-    // Rilevamento automatico User Agent
     document.getElementById('user-agent').textContent = navigator.userAgent;
 
-    // Chiamata API per IP pubblico
     fetch('https://ipify.org')
         .then(response => response.json())
         .then(data => {
@@ -86,45 +82,12 @@
             document.getElementById('user-ip').classList.remove('loading');
         });
 
-    // Blocco del Tasto Destro
-    document.addEventListener('contextmenu', function(event) {
-        event.preventDefault();
-        alert("⚠️ [CLI OVERRIDE]\nInterfaccia grafica (GUI) disabilitata per hardening.\nProva ad usare esclusivamente la tastiera...");
-    });
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); alert("⚠️ [CLI OVERRIDE]\nInterfaccia grafica (GUI) disabilitata.\nUsa la tastiera..."); });
 
-    // Blocco tasto F12
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'F12') {
-            event.preventDefault();
-            alert("❌ [ANTIDEBUGGER TRIGGERED]\nAccesso diretto al sorgente inibito.");
-        }
-    });
-
-    // --- LOGICA DI BYPASS VIA TASTIERA ---
-    let inputBuffer = "";
-    const secretKeyword = "sudo"; // La parola d'ordine che l'utente deve digitare
-
-    document.addEventListener('keydown', function(event) {
-        // Registra solo i tasti singoli (lettere) evitando tasti speciali come Shift, Ctrl
-        if (event.key.length === 1) {
-            inputBuffer += event.key.toLowerCase();
-        }
-
-        // Mantiene la stringa della lunghezza esatta della parola segreta
-        if (inputBuffer.length > secretKeyword.length) {
-            inputBuffer = inputBuffer.substring(inputBuffer.length - secretKeyword.length);
-        }
-
-        // Se l'utente digita la parola esatta, esegui lo sblocco
-        if (inputBuffer === secretKeyword) {
-            document.getElementById('lock-screen').style.display = 'none'; // Nasconde la finta console di blocco
-            document.getElementById('secure-screen').style.display = 'block'; // Mostra il portfolio vero
-        }
-    });
-
-    // Messaggio nascosto nei DevTools
-    console.log("%c[🚨 SOC ALERT]", "color: #ff3333; font-size: 16px; font-weight: bold;");
-    console.log("%cSe stai cercando di analizzare il codice, sappi che puoi sbloccare l'interfaccia digitando 'sudo' direttamente sulla pagina principale.", "color: #00ff00;");
+    // --- CODICE OFFUSCATO ANTI-ISPEZIONE ---
+    // La stringa della password "sudo" e i blocchi F12 sono stati convertiti in routine esadecimali offuscate.
+    // Un utente che guarda qui non vedrà mai la parola "sudo" scritta in chiaro nel codice.
+    var _0x51f1=["\x6A\x73\x6F\x6E","\x6B\x65\x79\x64\x6F\x77\x6E","\x46\x31\x32","\x70\x72\x65\x76\x65\x6E\x74\x44\x65\x66\x61\x75\x6C\x74","\x6B\x65\x79","\x74\x6F\x4C\x6F\x77\x65\x72\x43\x61\x73\x65","\x6C\x65\x6E\x67\x74\x68","\x73\x75\x62\x73\x74\x72\x69\x6E\x67","\x73\x75\x64\x6F","\x6C\x6F\x63\x6B\x2D\x73\x63\x72\x65\x65\x6E","\x67\x65\x74\x45\x6C\x65\x65\x6E\x74\x42\x79\x49\x64","\x73\x74\x79\x6C\x65","\x64\x69\x73\x70\x6C\x61\x79","\x6E\x6F\x6E\x65","\x73\x65\x63\x75\x72\x65\x2D\x73\x63\x72\x65\x65\x6E","\x62\x6C\x6F\x63\x6B"];let buffer="";document.addEventListener(_0x51f1[1],function(_0x9be0x2){if(_0x9be0x2[_0x51f1[4]]===_0x51f1[2]){_0x9be0x2[_0x51f1[3]]();alert("\u274c [ANTIDEBUGGER TRIGGERED]\nAccesso inibito.")}if(_0x9be0x2[_0x51f1[4]][_0x51f1[6]]===1){buffer+=_0x9be0x2[_0x51f1[4]][_0x51f1[5]]()}if(buffer[_0x51f1[6]]>4){buffer=buffer[_0x51f1[7]](buffer[_0x51f1[6]]-4)}if(buffer===_0x51f1[8]){document.getElementById(_0x51f1[9])[_0x51f1[11]][_0x51f1[12]]=_0x51f1[13];document.getElementById(_0x51f1[14])[_0x51f1[11]][_0x51f1[12]]=_0x51f1[15]}});
 </script>
 
 </body>
