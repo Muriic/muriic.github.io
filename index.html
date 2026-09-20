@@ -11,7 +11,7 @@
             font-family: 'Courier New', Courier, monospace;
             padding: 20px;
             line-height: 1.6;
-            user-select: none; /* Impedisce la selezione del testo per dare un effetto più rigido da terminale */
+            user-select: none;
         }
         .console {
             border: 1px solid #00ff00;
@@ -25,6 +25,15 @@
             color: #ff3333;
             font-weight: bold;
         }
+        .hidden-content {
+            display: none; /* Nasconde i contenuti veri finché non viene digitata la password */
+            border: 1px solid #00ffaa;
+            padding: 20px;
+            background-color: #020b08;
+            box-shadow: 0 0 20px rgba(0, 255, 170, 0.4);
+            max-width: 800px;
+            margin: 20px auto;
+        }
         .loading {
             animation: blink 1s infinite;
         }
@@ -35,20 +44,36 @@
 </head>
 <body>
 
-<div class="console">
+<!-- 1. SCHERMATA CENTRALE (FINTO BLOCCO) -->
+<div id="lock-screen" class="console">
     <p>[🚨 SECURITY AUDIT IN PROGRESS...]</p>
     <p>> TARGET DETECTED: <span id="user-agent">Rilevamento in corso...</span></p>
     <p>> PUBLIC IP ADDRESS: <span id="user-ip" class="loading">In attesa di handshake...</span></p>
     <hr style="border: 0; border-top: 1px dashed #00ff00;">
     <p class="error-msg">[!] ATTENZIONE: Interfaccia GUI limitata. Criteri di hardening attivi.</p>
+    <p style="color: #888888;">(Suggerimento di sistema: Digita la password "sudo" sulla tastiera per l'autenticazione analista...)</p>
     <p>guest@purpleteam-l1:~$ <span class="loading">_</span></p>
 </div>
 
+<!-- 2. SCHERMATA SEGRETA (SBLOCCATA VIA TASTIERA) -->
+<div id="secure-screen" class="hidden-content">
+    <h2 style="color: #00ffaa;">🔓 [OVERRIDE DI SISTEMA RIUSCITO - BENVENUTO ANALISTA]</h2>
+    <p>➔ Autenticazione bypassata con successo tramite keystroke injection.</p>
+    <hr style="border-0; border-top: 1px solid #00ffaa;">
+    <h3>🗂️ PORTFOLIO PROGETTI - PURPLE TEAM L1</h3>
+    <ul>
+        <li><b>Wi-Fi Pentesting Lab:</b> Analisi vulnerabilità protocolli WPA2/WPA3 e cattura handshake.</li>
+        <li><b>Offensive AI Security:</b> Studio di tecniche di Prompt Injection e hardening di LLM.</li>
+        <li><b>Incident Response:</b> Monitoraggio IoC e tracciamento tattiche MITRE ATT&CK.</li>
+    </ul>
+    <p>➔ Per i contatti o per catturare la Flag di ricognizione, esamina il file <code>/robots.txt</code>.</p>
+</div>
+
 <script>
-    // 1. Rilevamento automatico di Browser e Sistema Operativo (User Agent)
+    // Rilevamento automatico User Agent
     document.getElementById('user-agent').textContent = navigator.userAgent;
 
-    // 2. Chiamata API sicura e inoffensiva per recuperare l'IP pubblico del visitatore
+    // Chiamata API per IP pubblico
     fetch('https://ipify.org')
         .then(response => response.json())
         .then(data => {
@@ -61,50 +86,45 @@
             document.getElementById('user-ip').classList.remove('loading');
         });
 
-    // 3. Blocco del Tasto Destro con messaggio di sfida mirato
+    // Blocco del Tasto Destro
     document.addEventListener('contextmenu', function(event) {
         event.preventDefault();
-        alert("⚠️ [CLI OVERRIDE]\nInterfaccia grafica (GUI) disabilitata per hardening di livello L1.\nProva ad usare esclusivamente la tastiera...");
+        alert("⚠️ [CLI OVERRIDE]\nInterfaccia grafica (GUI) disabilitata per hardening.\nProva ad usare esclusivamente la tastiera...");
     });
 
-    // 4. Blocco dei tasti di ispezione classici (F12, Ctrl+Shift+I, Cmd+Opt+I, ecc.)
+    // Blocco tasto F12
     document.addEventListener('keydown', function(event) {
-        // Tasto F12
         if (event.key === 'F12') {
-            triggerWarning(event);
-        }
-        // Ctrl+Shift+I o Cmd+Option+I (Ispeziona)
-        if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'i') {
-            triggerWarning(event);
-        }
-        // Ctrl+Shift+J o Cmd+Option+J (Console)
-        if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'j') {
-            triggerWarning(event);
-        }
-        // Ctrl+U o Cmd+Option+U (Visualizza sorgente pagina)
-        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'u') {
-            triggerWarning(event);
+            event.preventDefault();
+            alert("❌ [ANTIDEBUGGER TRIGGERED]\nAccesso diretto al sorgente inibito.");
         }
     });
 
-    function triggerWarning(event) {
-        event.preventDefault();
-        alert("❌ [ANTIDEBUGGER TRIGGERED]\nTentativo di analisi dinamica rilevato. Accesso diretto al sorgente inibito.");
-    }
+    // --- LOGICA DI BYPASS VIA TASTIERA ---
+    let inputBuffer = "";
+    const secretKeyword = "sudo"; // La parola d'ordine che l'utente deve digitare
 
-    // 5. Messaggio di benvenuto segreto stampato direttamente nella Console Sviluppatori
-    // Se un utente esperto riesce comunque ad aprire la console, troverà questo:
-    console.log(
-        "%c[🚨 SOC ALERT - HIGH SEVERITY]", 
-        "color: #ff3333; font-family: monospace; font-size: 16px; font-weight: bold; background-color: #1a0000; padding: 5px;"
-    );
-    console.log(
-        "%c[+] Tattica MITRE ATT&CK rilevata: T1595 (Active Scanning)\n" +
-        "[+] Indicatore di Compromissione (IoC): DevTools Invocation\n" +
-        "[+] Stato: Payload d'attacco bloccato in ambiente sandbox.\n\n" +
-        "Sapevo che avresti guardato qui dentro 😉. Se sei un Recruiter o un Tech Lead alla ricerca di un analista Purple Team L1, sappi che questo è solo l'inizio del test.", 
-        "color: #00ff00; font-family: monospace; font-size: 13px;"
-    );
+    document.addEventListener('keydown', function(event) {
+        // Registra solo i tasti singoli (lettere) evitando tasti speciali come Shift, Ctrl
+        if (event.key.length === 1) {
+            inputBuffer += event.key.toLowerCase();
+        }
+
+        // Mantiene la stringa della lunghezza esatta della parola segreta
+        if (inputBuffer.length > secretKeyword.length) {
+            inputBuffer = inputBuffer.substring(inputBuffer.length - secretKeyword.length);
+        }
+
+        // Se l'utente digita la parola esatta, esegui lo sblocco
+        if (inputBuffer === secretKeyword) {
+            document.getElementById('lock-screen').style.display = 'none'; // Nasconde la finta console di blocco
+            document.getElementById('secure-screen').style.display = 'block'; // Mostra il portfolio vero
+        }
+    });
+
+    // Messaggio nascosto nei DevTools
+    console.log("%c[🚨 SOC ALERT]", "color: #ff3333; font-size: 16px; font-weight: bold;");
+    console.log("%cSe stai cercando di analizzare il codice, sappi che puoi sbloccare l'interfaccia digitando 'sudo' direttamente sulla pagina principale.", "color: #00ff00;");
 </script>
 
 </body>
