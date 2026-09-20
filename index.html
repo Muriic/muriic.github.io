@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERMINAL OVERRIDE v1.0</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            line-height: 1.6;
+            user-select: none; /* Impedisce la selezione del testo per dare un effetto più rigido da terminale */
+        }
+        .console {
+            border: 1px solid #00ff00;
+            padding: 20px;
+            background-color: #000000;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .error-msg {
+            color: #ff3333;
+            font-weight: bold;
+        }
+        .loading {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="console">
+    <p>[🚨 SECURITY AUDIT IN PROGRESS...]</p>
+    <p>> TARGET DETECTED: <span id="user-agent">Rilevamento in corso...</span></p>
+    <p>> PUBLIC IP ADDRESS: <span id="user-ip" class="loading">In attesa di handshake...</span></p>
+    <hr style="border: 0; border-top: 1px dashed #00ff00;">
+    <p class="error-msg">[!] ATTENZIONE: Interfaccia GUI limitata. Criteri di hardening attivi.</p>
+    <p>guest@purpleteam-l1:~$ <span class="loading">_</span></p>
+</div>
+
+<script>
+    // 1. Rilevamento automatico di Browser e Sistema Operativo (User Agent)
+    document.getElementById('user-agent').textContent = navigator.userAgent;
+
+    // 2. Chiamata API sicura e inoffensiva per recuperare l'IP pubblico del visitatore
+    fetch('https://ipify.org')
+        .then(response => response.json())
+        .then(data => {
+            const ipSpan = document.getElementById('user-ip');
+            ipSpan.textContent = data.ip;
+            ipSpan.classList.remove('loading');
+        })
+        .catch(error => {
+            document.getElementById('user-ip').textContent = "Unknown / Proxy detected";
+            document.getElementById('user-ip').classList.remove('loading');
+        });
+
+    // 3. Blocco del Tasto Destro con messaggio di sfida mirato
+    document.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+        alert("⚠️ [CLI OVERRIDE]\nInterfaccia grafica (GUI) disabilitata per hardening di livello L1.\nProva ad usare esclusivamente la tastiera...");
+    });
+
+    // 4. Blocco dei tasti di ispezione classici (F12, Ctrl+Shift+I, Cmd+Opt+I, ecc.)
+    document.addEventListener('keydown', function(event) {
+        // Tasto F12
+        if (event.key === 'F12') {
+            triggerWarning(event);
+        }
+        // Ctrl+Shift+I o Cmd+Option+I (Ispeziona)
+        if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'i') {
+            triggerWarning(event);
+        }
+        // Ctrl+Shift+J o Cmd+Option+J (Console)
+        if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'j') {
+            triggerWarning(event);
+        }
+        // Ctrl+U o Cmd+Option+U (Visualizza sorgente pagina)
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'u') {
+            triggerWarning(event);
+        }
+    });
+
+    function triggerWarning(event) {
+        event.preventDefault();
+        alert("❌ [ANTIDEBUGGER TRIGGERED]\nTentativo di analisi dinamica rilevato. Accesso diretto al sorgente inibito.");
+    }
+
+    // 5. Messaggio di benvenuto segreto stampato direttamente nella Console Sviluppatori
+    // Se un utente esperto riesce comunque ad aprire la console, troverà questo:
+    console.log(
+        "%c[🚨 SOC ALERT - HIGH SEVERITY]", 
+        "color: #ff3333; font-family: monospace; font-size: 16px; font-weight: bold; background-color: #1a0000; padding: 5px;"
+    );
+    console.log(
+        "%c[+] Tattica MITRE ATT&CK rilevata: T1595 (Active Scanning)\n" +
+        "[+] Indicatore di Compromissione (IoC): DevTools Invocation\n" +
+        "[+] Stato: Payload d'attacco bloccato in ambiente sandbox.\n\n" +
+        "Sapevo che avresti guardato qui dentro 😉. Se sei un Recruiter o un Tech Lead alla ricerca di un analista Purple Team L1, sappi che questo è solo l'inizio del test.", 
+        "color: #00ff00; font-family: monospace; font-size: 13px;"
+    );
+</script>
+
+</body>
+</html>
