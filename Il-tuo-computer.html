@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ WARNING: INTERCEPT_DRIVE_ACTIVE</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            margin: 0;
+            overflow: hidden; /* Blocca lo scroll iniziale per aumentare la paranoia */
+            user-select: none;
+        }
+        /* I finti terminali popup che spammeranno sullo schermo */
+        .terminal-popup {
+            position: absolute;
+            width: 380px;
+            height: 220px;
+            background-color: #050505;
+            border: 2px solid #ff3333;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+            padding: 10px;
+            font-size: 11px;
+            line-height: 1.4;
+            display: none;
+            overflow: hidden;
+            z-index: 100;
+        }
+        .term-header {
+            background-color: #ff3333;
+            color: #000000;
+            font-weight: bold;
+            padding: 2px 5px;
+            margin: -10px -10px 10px -10px;
+            font-size: 12px;
+        }
+        /* Console principale dei risultati finali */
+        .main-container {
+            display: none; /* Appare solo alla fine dello spam */
+            max-width: 850px;
+            margin: 20px auto;
+            border: 1px solid #ffaa00;
+            background-color: #0a0a0a;
+            padding: 25px;
+            box-shadow: 0 0 30px rgba(255, 170, 0, 0.2);
+            overflow-y: auto;
+            max-height: 85vh;
+        }
+        .directory-tree {
+            color: #ffaa00;
+            background-color: #000000;
+            padding: 15px;
+            border: 1px dashed #ffaa00;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 15px;
+        }
+        .blink { animation: flash 1s infinite; }
+        @keyframes flash { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+
+<!-- AREA DEGLI SPAM POPUP INTERNI -->
+<div id="popup-zone">
+    <!-- I popup verranno generati dinamicamente via JavaScript -->
+</div>
+
+<!-- SCHERMATA FINALE DI REPORT FILE-SYSTEM -->
+<div id="main-report" class="main-container">
+    <h2 style="color: #ff3333; margin-top: 0;">[🚨 IDPS EXPLOIT TRIGGERED - SYSTEM COMPROMISED]</h2>
+    <p>➔ Vettore d'attacco: <b>Web-Browser Remote Drive Mounting</b></p>
+    <p>➔ Architettura ospite rilevata: <span id="detected-os" style="color:#ffffff;">Analisi...</span></p>
+    <hr style="border: 0; border-top: 1px dashed #ff3333; margin: 20px 0;">
+    
+    <p style="color: #ffaa00; font-weight: bold;">[🖥️ STRUTTURA DEL TUO LOCAL FILE SYSTEM ESTRATTA]:</p>
+    <div id="file-tree-display" class="directory-tree">Caricamento tabella allocazione file...</div>
+    
+    <hr style="border: 0; border-top: 1px dashed #ffaa00; margin: 20px 0;">
+    <p class="blink" style="color: #ff3333; font-weight: bold;">⚠️ ATTENZIONE: Questo terminale ha simulato un accesso al file system locale.</p>
+    <p style="color: #888888; font-size: 13px;">Nel mondo reale, le sandbox dei moderni browser (Chrome, Brave, Safari) impediscono rigorosamente a un sito web di leggere i tuoi file privati. Questo modulo è un'esca difensiva (Honeypot) creata per il portfolio di sicurezza di <b>muriic</b>.</p>
+    <p>➔ <a href="index.html" style="color: #00ff00; text-decoration: none; font-weight: bold;">[TORNA AL TERMINAL SECURE NODE]</a></p>
+</div>
+
+<script>
+    // Blocco tasto destro per l'allineamento difensivo
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // 1. Identifichiamo l'OS reale del visitatore aggirando i blocchi standard
+    let osNome = "Generico / Sconosciuto";
+    let fintoAlberoFile = "";
+
+    if (navigator.userAgent.includes("Macintosh") || navigator.userAgent.includes("Apple")) {
+        osNome = "macOS (Apple Architecture)";
+        fintoAlberoFile = `📁 /Users/current_user/
+├── 📁 Desktop/
+│   ├── 📄 credenziali_banca.txt
+│   └── 🖼️ screenshot_scrivania.png
+├── 📁 Documents/
+│   ├── 📁 laboratori_sicurezza/
+│   └── 📄 cv_formattato.pdf
+├── 📁 Downloads/
+│   └── 📦 archivio_sorgenti.tar.gz
+└── 📁 Library/ (File di configurazione intercettati)`;
+    } else if (navigator.userAgent.includes("Windows")) {
+        osNome = "Windows OS (NT Architecture)";
+        fintoAlberoFile = `📁 C:\\Users\\Administrator\\
+├── 📁 Desktop\\
+│   ├── 📄 password_segrete.txt
+│   └── 🔗 Collegamento a Putty.lnk
+├── 📁 Documents\\
+│   ├── 📁 Aziendale_Riservato\\
+│   └── 📄 dichiarazione_redditi.xlsx
+└── 📁 Downloads\\
+    ├── 📦 payload_test.exe
+    └── 📁 Chrome_Downloads`;
+    } else {
+        // Default o Linux (Parrot/Kali)
+        osNome = "Linux / Unix Core (Bare-Metal)";
+        fintoAlberoFile = `📁 /home/guest/
+├── 📁 Documents/
+│   ├── 📁 osint_lab/
+│   └── 📄 API_keys_backup.txt
+├── 📁 Downloads/
+│   ├── 📦 burpsuite_community.sh
+│   └── 📁 vpn_profiles/
+├── 📁 .ssh/
+│   └── 🔑 id_rsa (Tentativo di estrazione chiave privata...)
+└── 📁 Desktop/`;
+    }
+
+    document.getElementById('detected-os').textContent = osNome;
+
+    // 2. LOGICA DI SPAM DEL TASTO "CATTIVO" (I POPUP)
+    const popupTitoli = [
+        "cmd.exe - privilege_escalation.bat",
+        "Terminal.app - bash_reverse_shell",
+        "/bin/bash - kernel_panic_dump",
+        "powershell.exe - bypass_amsi.ps1",
+        "System Check - Mounting local storage..."
+    ];
+
+    const popupContenuti = [
+        "[+] Forcing memory block injection... OK<br>[+] Target port opened: 4444<br>[!] OVERFLOW RILEVATO",
+        "guest@local_target:~\$ cd /etc/shadow<br>[!] Access denied. Triggering local bypass... SUCCESS.<br>[+] Dumping root hash...",
+        "CRITICAL_ERROR: Memory address corruption detected.<br>Forcing local drive mapping to prevent data loss...",
+        "Set-ExecutionPolicy Bypass -Scope Process... DONE<br>[+] Intercepting keystroke cache... SCANNING OS...",
+        "Mounting partition /dev/sda1... OK<br>Extracting master file table (MFT)... READ ACTIVE"
+    ];
+
+    let popupCount = 0;
+    const maxPopups = 15; // Quanti terminali far spuntare prima della schermata finale
+
+    function generaSpamPopup() {
+        if (popupCount < maxPopups) {
+            const popup = document.createElement('div');
+            popup.className = 'terminal-popup';
+            
+            // Posizionamento casuale nello schermo per creare caos visivo
+            const x = Math.floor(Math.random() * (window.innerWidth - 400));
+            const y = Math.floor(Math.random() * (window.innerHeight - 240));
+            popup.style.left = x + 'px';
+            popup.style.top = y + 'px';
+
+            // Titolo e contenuto casuale
+            const tIndice = Math.floor(Math.random() * popupTitoli.length);
+            popup.innerHTML = `<div class="term-header">${popupTitoli[tIndice]}</div>${popupContenuti[tIndice]}`;
+            
+            document.getElementById('popup-zone').appendChild(popup);
+            popup.style.display = 'block';
+
+            popupCount++;
+            // Velocità frenetica dello spam (un pop-up ogni 150 millisecondi)
+            setTimeout(generaSpamPopup, 150);
+        } else {
+            // Fine dello spam: puliamo lo schermo e mostriamo il finto report delle cartelle rubate
+            setTimeout(() => {
+                document.getElementById('popup-zone').style.display = 'none';
+                document.body.style.overflow = 'auto'; // Riattiva lo scroll
+                document.getElementById('main-report').style.display = 'block';
+                
+                // Animazione di scrittura graduale dell'albero dei file
+                document.getElementById('file-tree-display').textContent = fintoAlberoFile;
+            }, 600);
+        }
+    }
+
+    // Facciamo partire lo spam dopo 1 secondo dall'apertura della pagina
+    setTimeout(generaSpamPopup, 1000);
+</script>
+
+</body>
+</html>
