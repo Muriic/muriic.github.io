@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERMINAL OVERRIDE v1.0</title>
+    <title>TERMINAL OVERRIDE v1.2</title>
     <style>
         body {
             background-color: #0d1117;
@@ -25,6 +25,13 @@
             color: #ff3333;
             font-weight: bold;
         }
+        .proxy-alert {
+            color: #ffaa00;
+            font-weight: bold;
+            background-color: #2a1a00;
+            padding: 2px 5px;
+            border: 1px dashed #ffaa00;
+        }
         .hidden-content {
             display: none;
             border: 1px solid #00ffaa;
@@ -44,78 +51,107 @@
 </head>
 <body>
 
+<!-- SCHERMATA DI BLOCCO INIZIALE -->
 <div id="lock-screen" class="console">
     <p>[🚨 SECURITY AUDIT IN PROGRESS...]</p>
-    <p>> TARGET DETECTED: <span id="user-agent">Rilevamento in corso...</span></p>
-    <p>> PUBLIC IP ADDRESS: <span id="user-ip" class="loading">In attesa di handshake...</span></p>
+    <p>➔ TARGET DETECTED: <span id="user-agent">Rilevamento in corso...</span></p>
+    <p>➔ PUBLIC IP ADDRESS: <span id="user-ip" class="loading">In attesa di handshake...</span></p>
+    <p>➔ GEOLOCATION: <span id="user-geo" class="loading">Tracciamento coordinate...</span></p>
+    
+    <!-- Box dinamico se rileva VPN / Anonsurf -->
+    <div id="proxy-log-block" style="display: none; margin: 15px 0;">
+        <p class="proxy-alert">[⚠️ NETWORK INTEGRITY ALERT]</p>
+        <p style="color: #ffaa00;"> ├─ STATUS: INTRADAMENTO ANONIMO (Anonsurf / VPN Active)</p>
+        <p style="color: #ffaa00;"> └─ NETWORK: <span id="detected-datacenter">Analisi ISP...</span></p>
+    </div>
+
     <hr style="border: 0; border-top: 1px dashed #00ff00;">
     <p class="error-msg">[!] ATTENZIONE: Interfaccia GUI limitata. Criteri di hardening attivi.</p>
-    <p style="color: #888888;">(Suggerimento di sistema: Digita la password di sblocco analista sulla tastiera...)</p>
-    <p>guest@purpleteam-l1:~$ <span class="loading">_</span></p>
+    <p style="color: #888888;">(Suggerimento di sistema: Digita la password "sudo" sulla tastiera...)</p>
+    <p>guest@purpleteam-l1:~\$ <span class="loading">_</span></p>
 </div>
 
+<!-- SCHERMATA SEGRETA SBLOCCATA -->
 <div id="secure-screen" class="hidden-content">
-    <h2 style="color: #00ffaa;">🔓 [OVERRIDE DI SISTEMA RIUSCITO - BENVENUTO ANALISTA]</h2>
-    <p>➔ Autenticazione bypassata con successo tramite keystroke injection.</p>
-    <hr style="border: 0; border-top: 1px solid #00ffaa;">
-    <h3>🗂️ PORTFOLIO PROGETTI - PURPLE TEAM L1</h3>
-    <ul>
-        <li><b>Wi-Fi Pentesting Lab:</b> Analisi vulnerabilità protocolli WPA2/WPA3 e cattura handshake.</li>
-        <li><b>Offensive AI Security:</b> Studio di tecniche di Prompt Injection e hardening di LLM.</li>
-        <li><b>Incident Response:</b> Monitoraggio IoC e tracciamento tattiche MITRE ATT&CK.</li>
-    </ul>
-    <p>➔ Per i contatti o per catturare la Flag di ricognizione, esamina il file <code>/robots.txt</code>.</p>
+    <!-- Qui inietteremo tra poco il modulo Wi-Fi Pentest simulato -->
+    <div id="wifi-terminal-zone"></div>
 </div>
+
 <script>
-    // 1. Inserimento automatico User Agent
+    // 1. Rilevamento iniziale User Agent
     document.getElementById('user-agent').textContent = navigator.userAgent;
 
-    // 2. Sistema di rilevamento IP ottimizzato per Chrome con Failover automatico
-    function fetchUserIP() {
-        const ipSpan = document.getElementById('user-ip');
+    // Variabili globali persistenti per l'attacco wireless di domani
+    window.userIP = "127.0.0.1";
+    window.userISP = "Rete Locale Locale";
+    window.userCity = "Sconosciuta";
 
-        // Tentativo 1: Servizio alternativo compatibile con le policy HTTPS di Chrome
-        fetch('https://seeip.org')
+    // 2. Intelligence di Rete (IP, ISP, Localizzazione, Proxy Check)
+    function eseguiThreatIntel() {
+        const ipSpan = document.getElementById('user-ip');
+        const geoSpan = document.getElementById('user-geo');
+        const proxyBlock = document.getElementById('proxy-log-block');
+        const dcSpan = document.getElementById('detected-datacenter');
+
+        // Servizio HTTPS ad alta precisione
+        fetch('https://ipapi.co')
             .then(response => response.json())
             .then(data => {
-                ipSpan.textContent = data.ip;
+                window.userIP = data.ip || "127.0.0.1";
+                window.userISP = data.org || "Operatore Sconosciuto";
+                window.userCity = data.city || "Località Protetta";
+                const country = data.country_name || "IT";
+
+                // Aggiorna l'interfaccia principale
+                geoSpan.textContent = `${window.userCity}, ${country}`;
+                geoSpan.classList.remove('loading');
+
+                // Firme note per Datacenter, TOR Exit Nodes e VPN
+                const threatKeywords = ["tor", "exit", "node", "onion", "vpn", "hosting", "datacenter", "ovh", "digitalocean", "linode", "mullvad", "proton", "aws", "leaseweb"];
+                let proxyTriggered = false;
+
+                threatKeywords.forEach(word => {
+                    if (window.userISP.toLowerCase().includes(word)) {
+                        proxyTriggered = true;
+                    }
+                });
+
+                if (proxyTriggered) {
+                    ipSpan.innerHTML = `${window.userIP} <span style="color: #ffaa00; font-weight: bold;">[ANONYMOUS NODE]</span>`;
+                    dcSpan.textContent = window.userISP;
+                    proxyBlock.style.display = 'block';
+                } else {
+                    ipSpan.textContent = window.userIP;
+                }
                 ipSpan.classList.remove('loading');
             })
             .catch(() => {
-                // Tentativo 2: Ipify in formato testo nativo (riduce i problemi CORS)
-                fetch('https://api.ipify.org')
-                    .then(response => response.text())
-                    .then(iptext => {
-                        ipSpan.textContent = iptext;
-                        ipSpan.classList.remove('loading');
-                    })
-                    .catch(() => {
-                        // COMPORTAMENTO PURPLE TEAM: Se Chrome blocca le chiamate OSINT,
-                        // simuliamo una protezione avanzata attivando l'indirizzo di Loopback locale.
-                        ipSpan.textContent = "127.0.0.1 [PROTECTED BY LOCAL FIREWALL]";
-                        ipSpan.style.color = "#ffaa00";
-                        ipSpan.classList.remove('loading');
-                    });
+                // Se uBlock o Anonsurf bloccano l'API di geolocalizzazione, impostiamo una deviazione fittizia sicura
+                ipSpan.textContent = "127.0.0.1 [PROTECTED BY LOCAL FIREWALL]";
+                ipSpan.style.color = "#ffaa00";
+                ipSpan.classList.remove('loading');
+                geoSpan.textContent = "Loopback Mode (Geocoding Bypassed)";
+                geoSpan.classList.remove('loading');
             });
     }
 
-    // Esegui la funzione di rete
-    fetchUserIP();
+    eseguiThreatIntel();
 
-    // 3. Contromisure GUI (Blocco Tasto Destro)
-    document.addEventListener('contextmenu', function(e) { 
+    // 3. Hardening di base (Blocco tasto destro)
+    document.addEventListener('contextmenu', e => { 
         e.preventDefault(); 
         alert("⚠️ [CLI OVERRIDE]\nInterfaccia grafica (GUI) disabilitata.\nUsa esclusivamente la tastiera..."); 
     });
 
-    // 4. Logica di Bypass via Tastiera (Offuscata)
-    var _0x51f1=["\x6A\x73\x6F\x6E","\x6B\x65\x79\x64\x6F\x77\x6E","\x46\x31\x32","\x70\x72\x65\x76\x65\x6E\x74\x44\x65\x66\x61\x75\x6C\x74","\x6B\x65\x79","\x74\x6F\x4C\x6F\x77\x65\x72\x43\x61\x73\x65","\x6C\x65\x6E\x67\x74\x68","\x73\x75\x62\x73\x74\x72\x69\x6E\x67","\x73\x75\x64\x6F","\x6C\x6F\x63\x6B\x2D\x73\x63\x72\x65\x65\x6E","\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64","\x73\x74\x79\x6C\x65","\x64\x69\x73\x70\x6C\x61\x79","\x6E\x6F\x6E\x65","\x73\x65\x63\x75\x72\x65\x2D\x73\x63\x72\x65\x65\x6E","\x62\x6C\x6F\x63\x6B"];let buffer="";document.addEventListener(_0x51f1[1],function(e){if(e[_0x51f1[4]]===_0x51f1[2]){e[_0x51f1[3]]();alert("\u274c [ANTIDEBUGGER TRIGGERED]\nAccesso inibito.")}if(e[_0x51f1[4]][_0x51f1[6]]===1){buffer+=e[_0x51f1[4]][_0x51f1[5]]()}if(buffer[_0x51f1[6]]>4){buffer=buffer[_0x51f1[7]](buffer[_0x51f1[6]]-4)}if(buffer===_0x51f1[8]){document.getElementById(_0x51f1[9])[_0x51f1[11]][_0x51f1[12]]=_0x51f1[13];document.getElementById(_0x51f1[14])[_0x51f1[11]][_0x51f1[12]]=_0x51f1[15]}});
-
-    // Messaggi per gli strumenti sviluppatore
-    console.log("%c[🚨 SOC ALERT]", "color: #ff3333; font-size: 16px; font-weight: bold;");
-    console.log("%cRilevato controllo console. Per eseguire l'override digitare 'sudo' sulla pagina principale.", "color: #00ff00;");
+    // 4. Logica tastiera (Offuscata per nascondere "sudo")
+    var _0x51f1=["\x6A\x73\x6F\x6E","\x6B\x65\x79\x64\x6F\x77\x6E","\x46\x31\x32","\x70\x72\x65\x76\x65\x6E\x74\x44\x65\x66\x61\x75\x6C\x74","\x6B\x65\x79","\x74\x6F\x4C\x6F\x77\x65\x72\x43\x61\x73\x65","\x6C\x65\x6E\x67\x74\x68","\x73\x75\x62\x73\x74\x72\x69\x6E\x67","\x73\x75\x64\x6F","\x6C\x6F\x63\x6B\x2D\x73\x63\x72\x65\x65\x6E","\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64","\x73\x74\x79\x6C\x65","\x64\x69\x73\x70\x6C\x61\x79","\x6E\x6F\x6E\x65","\x73\x65\x63\x75\x72\x65\x2D\x73\x63\x72\x65\x65\x6E","\x62\x6C\x6F\x63\x6B"];let buffer="";document.addEventListener(_0x51f1,function(e){if(e[_0x51f1]===_0x51f1){e[_0x51f1]();alert("\u274c [ANTIDEBUGGER TRIGGERED]")}if(e[_0x51f1][_0x51f1]===1){buffer+=e[_0x51f1][_0x51f1]()}if(buffer[_0x51f1]>4){buffer=buffer[_0x51f1](buffer[_0x51f1]-4)}if(buffer===_0x51f1){
+        document.getElementById(_0x51f1)[_0x51f1][_0x51f1]=_0x51f1;
+        document.getElementById(_0x51f1)[_0x51f1][_0x51f1]=_0x51f1;
+        
+        // Avvisiamo la console che lo sblocco è andato a buon fine
+        console.log("🔓 Override riuscito. Variabili passate: IP=" + window.userIP + ", ISP=" + window.userISP);
+    }});
 </script>
-
 
 </body>
 </html>
